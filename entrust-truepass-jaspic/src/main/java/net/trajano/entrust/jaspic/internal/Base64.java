@@ -61,7 +61,7 @@ public final class Base64 {
         if (base64String == null) {
             return null;
         }
-        return new String(decode, Charset.defaultCharset());
+        return new String(decode(base64String), Charset.defaultCharset());
     }
 
     /**

@@ -7,8 +7,8 @@
     <version>3.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>entrust-truepass-sample-web</artifactId>
-  <name>Entrust TruePass Sample Web App</name>
   <packaging>war</packaging>
+  <name>Entrust TruePass Sample Web App</name>
   <description>This provides an application and modules that implement intrgration of Entrust TruePass on a Java application server.</description>
   <scm>
     <url>https://github.com/trajano/${repo.id}</url>

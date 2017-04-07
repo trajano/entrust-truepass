@@ -1,26 +1,30 @@
 package net.trajano.entrust.jaspic;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.message.AuthException;
 import javax.security.auth.message.config.AuthConfigFactory;
-import javax.security.auth.message.config.AuthConfigProvider;
-import javax.security.auth.message.config.ClientAuthConfig;
-import javax.security.auth.message.config.ServerAuthConfig;
-import javax.security.auth.message.module.ClientAuthModule;
-import javax.security.auth.message.module.ServerAuthModule;
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 
 public class EntrustTruePassServletContextInitializer implements
     ServletContextListener {
 
+    /**
+     * Registers the authentication modules. {@inheritDoc} 
+     */
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
 
-        Map<String, String> options = new HashMap<String, String>();
+        final Map<String, String> options = new ConcurrentHashMap<String, String>();
         AuthConfigFactory.getFactory()
             .registerConfigProvider(EntrustTruePassAuthModuleConfigProvider.class.getName(), options, "HttpServlet", null, null);
     }
+
+    /**
+     * Does nothing. {@inheritDoc} 
+     */
+	@Override
+	public void contextDestroyed(ServletContextEvent sce) {
+	}
 }
