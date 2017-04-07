@@ -32,149 +32,165 @@ import net.trajano.entrust.jaspic.internal.Base64;
  * 
  * @see https://trajano.net/2014/06/creating-a-simple-jaspic-auth-module/
  */
-public class EntrustTruePassJaspicModule implements ServerAuthModule, ServerAuthContext {
+public class EntrustTruePassJaspicModule implements
+    ServerAuthModule,
+    ServerAuthContext {
 
-	/**
-	 * Logger.
-	 */
-	private static final Logger LOG;
+    /**
+     * Logger.
+     */
+    private static final Logger LOG;
 
-	/**
-	 * Entrust HTTP Header.
-	 */
-	public static final String ENTRUST_HTTP_HEADER = "Entrust-Client";
+    /**
+     * Entrust HTTP Header.
+     */
+    public static final String ENTRUST_HTTP_HEADER = "Entrust-Client";
 
-	static {
-		LOG = Logger.getLogger("net.trajano.entrust.jaspic");
-	}
+    static {
+        LOG = Logger.getLogger("net.trajano.entrust.jaspic");
+    }
 
-	/**
-	 * Callback handler that is passed in initialize by the container. This
-	 * processes the callbacks which are objects that populate the "subject".
-	 */
-	private CallbackHandler handler;
+    /**
+     * Callback handler that is passed in initialize by the container. This
+     * processes the callbacks which are objects that populate the "subject".
+     */
+    private CallbackHandler handler;
 
-	/**
-	 * Mandatory flag.
-	 */
-	private boolean mandatory;
+    /**
+     * Mandatory flag.
+     */
+    private boolean mandatory;
 
-	/**
-	 * Does nothing.
-	 *
-	 * @param messageInfo
-	 *            message info
-	 * @param subject
-	 *            subject
-	 */
-	@Override
-	public void cleanSubject(final MessageInfo messageInfo, final Subject subject) throws AuthException {
+    /**
+     * Does nothing.
+     *
+     * @param messageInfo
+     *            message info
+     * @param subject
+     *            subject
+     */
+    @Override
+    public void cleanSubject(final MessageInfo messageInfo,
+        final Subject subject) throws AuthException {
 
-		// Does nothing.
-	}
+        // Does nothing.
+    }
 
-	/**
-	 * <p>
-	 * Supported message types. For our case we only need to deal with HTTP
-	 * servlet request and responses. On Java EE 7 this will handle WebSockets
-	 * as well.
-	 * </p>
-	 * <p>
-	 * This creates a new array for security at the expense of performance.
-	 * </p>
-	 *
-	 * @return {@link HttpServletRequest} and {@link HttpServletResponse}
-	 *         classes.
-	 */
-	@SuppressWarnings("rawtypes")
-	@Override
-	public Class[] getSupportedMessageTypes() {
+    /**
+     * <p>
+     * Supported message types. For our case we only need to deal with HTTP
+     * servlet request and responses. On Java EE 7 this will handle WebSockets
+     * as well.
+     * </p>
+     * <p>
+     * This creates a new array for security at the expense of performance.
+     * </p>
+     *
+     * @return {@link HttpServletRequest} and {@link HttpServletResponse}
+     *         classes.
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    public Class[] getSupportedMessageTypes() {
 
-		return new Class<?>[] { HttpServletRequest.class, HttpServletResponse.class };
-	}
+        return new Class<?>[] {
+            HttpServletRequest.class,
+            HttpServletResponse.class
+        };
+    }
 
-	/**
-	 * Builds a list of groups from the request. This simply returns "users"
-	 *
-	 * @param req
-	 *            servlet request.
-	 * @return array of groups.
-	 */
-	private String[] groups(final HttpServletRequest req) {
+    /**
+     * Builds a list of groups from the request. This simply returns "users".
+     * This value must match the security-roles in web.xml
+     *
+     * @param req
+     *            servlet request.
+     * @return array of groups.
+     */
+    private String[] groups(final HttpServletRequest req) {
 
-		return new String[] { "users" };
-	}
+        return new String[] {
+            "users"
+        };
+    }
 
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @param requestPolicy
-	 *            request policy, ignored
-	 * @param responsePolicy
-	 *            response policy, ignored
-	 * @param h
-	 *            callback handler
-	 * @param options
-	 *            options
-	 */
-	@Override
-	public void initialize(final MessagePolicy requestPolicy, final MessagePolicy responsePolicy,
-			final CallbackHandler h, @SuppressWarnings("rawtypes") final Map options) throws AuthException {
+    /**
+     * {@inheritDoc}
+     *
+     * @param requestPolicy
+     *            request policy, ignored
+     * @param responsePolicy
+     *            response policy, ignored
+     * @param h
+     *            callback handler
+     * @param options
+     *            options
+     */
+    @Override
+    public void initialize(final MessagePolicy requestPolicy,
+        final MessagePolicy responsePolicy,
+        final CallbackHandler h,
+        @SuppressWarnings("rawtypes") final Map options) throws AuthException {
 
-		handler = h;
-		mandatory = requestPolicy.isMandatory();
-	}
+        handler = h;
+        mandatory = requestPolicy.isMandatory();
+    }
 
-	/**
-	 * Return {@link AuthStatus#SEND_SUCCESS}.
-	 *
-	 * @param messageInfo
-	 *            contains the request and response messages. At this point the
-	 *            response message is already committed so nothing can be
-	 *            changed.
-	 * @param subject
-	 *            subject.
-	 * @return {@link AuthStatus#SEND_SUCCESS}
-	 */
-	@Override
-	public AuthStatus secureResponse(final MessageInfo messageInfo, final Subject subject) throws AuthException {
+    /**
+     * Return {@link AuthStatus#SEND_SUCCESS}.
+     *
+     * @param messageInfo
+     *            contains the request and response messages. At this point the
+     *            response message is already committed so nothing can be
+     *            changed.
+     * @param subject
+     *            subject.
+     * @return {@link AuthStatus#SEND_SUCCESS}
+     */
+    @Override
+    public AuthStatus secureResponse(final MessageInfo messageInfo,
+        final Subject subject) throws AuthException {
 
-		return AuthStatus.SEND_SUCCESS;
-	}
+        return AuthStatus.SEND_SUCCESS;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public AuthStatus validateRequest(final MessageInfo messageInfo, final Subject client, final Subject serviceSubject)
-			throws AuthException {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AuthStatus validateRequest(final MessageInfo messageInfo,
+        final Subject client,
+        final Subject serviceSubject)
+        throws AuthException {
 
-		final HttpServletRequest req = (HttpServletRequest) messageInfo.getRequestMessage();
-		final HttpServletResponse resp = (HttpServletResponse) messageInfo.getResponseMessage();
-		try {
-			if (!mandatory && !req.isSecure()) {
-				return AuthStatus.SUCCESS;
-			}
-			if (!req.isSecure()) {
-				resp.sendError(HttpURLConnection.HTTP_FORBIDDEN, "An HTTPS connection is required");
-				return AuthStatus.SEND_FAILURE;
-			}
-			final String userName = Base64.decodeToString(req.getHeader(ENTRUST_HTTP_HEADER));
-			if (userName == null && mandatory) {
-				return AuthStatus.FAILURE;
-			} else if (userName == null && !mandatory) {
-				return AuthStatus.SUCCESS;
-			}
+        final HttpServletRequest req = (HttpServletRequest) messageInfo.getRequestMessage();
+        final HttpServletResponse resp = (HttpServletResponse) messageInfo.getResponseMessage();
+        try {
+            if (!mandatory && !req.isSecure()) {
+                return AuthStatus.SUCCESS;
+            }
+            if (!req.isSecure()) {
+                resp.sendError(HttpURLConnection.HTTP_FORBIDDEN, "An HTTPS connection is required");
+                return AuthStatus.SEND_FAILURE;
+            }
+            final String userName = Base64.decodeToString(req.getHeader(ENTRUST_HTTP_HEADER));
+            if (userName == null && mandatory) {
+                return AuthStatus.FAILURE;
+            } else if (userName == null && !mandatory) {
+                return AuthStatus.SUCCESS;
+            }
 
-			handler.handle(new Callback[] { new CallerPrincipalCallback(client, userName),
-					new GroupPrincipalCallback(client, groups(req)) });
-			return AuthStatus.SUCCESS;
-		} catch (final IOException e) {
-			LOG.throwing(this.getClass().getName(), "IOException was thrown on validateRequest()", e);
-			throw new AuthException(e.getMessage());
-		} catch (final UnsupportedCallbackException e) {
-			LOG.throwing(this.getClass().getName(), "UnsupportedCallbackException was thrown on validateRequest()", e);
-			throw new AuthException(e.getMessage());
-		}
-	}
+            handler.handle(new Callback[] {
+                new CallerPrincipalCallback(client, userName),
+                new GroupPrincipalCallback(client, groups(req))
+            });
+            return AuthStatus.SUCCESS;
+        } catch (final IOException e) {
+            LOG.throwing(this.getClass().getName(), "IOException was thrown on validateRequest()", e);
+            throw new AuthException(e.getMessage());
+        } catch (final UnsupportedCallbackException e) {
+            LOG.throwing(this.getClass().getName(), "UnsupportedCallbackException was thrown on validateRequest()", e);
+            throw new AuthException(e.getMessage());
+        }
+    }
 }

@@ -8,8 +8,6 @@ import javax.security.auth.message.config.AuthConfigFactory;
 import javax.security.auth.message.config.AuthConfigProvider;
 import javax.security.auth.message.config.ClientAuthConfig;
 import javax.security.auth.message.config.ServerAuthConfig;
-import javax.security.auth.message.module.ClientAuthModule;
-import javax.security.auth.message.module.ServerAuthModule;
 
 import net.trajano.entrust.jaspic.internal.ServerAuthModuleAuthConfig;
 

@@ -1,23 +1,18 @@
 package net.trajano.entrust.jaspic.internal;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.message.AuthException;
+import javax.security.auth.message.MessageInfo;
+import javax.security.auth.message.MessagePolicy;
+import javax.security.auth.message.MessagePolicy.TargetPolicy;
 import javax.security.auth.message.config.ServerAuthConfig;
 import javax.security.auth.message.config.ServerAuthContext;
 import javax.security.auth.message.module.ServerAuthModule;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.message.MessageInfo;
-import javax.security.auth.message.MessagePolicy;
-import javax.security.auth.message.MessagePolicy.TargetPolicy;
-
-import net.trajano.entrust.jaspic.EntrustTruePassAuthModuleConfigProvider;
 import net.trajano.entrust.jaspic.EntrustTruePassJaspicModule;
 
 /**
@@ -115,8 +110,7 @@ public class ServerAuthModuleAuthConfig implements
      */
     public String getAuthContextID(final MessageInfo messageInfo) {
 
-        final Object isMandatory = messageInfo.getMap()
-            .get(JAVAX_SECURITY_AUTH_MESSAGE_MESSAGE_POLICY_IS_MANDATORY);
+        final Object isMandatory = messageInfo.getMap().get(JAVAX_SECURITY_AUTH_MESSAGE_MESSAGE_POLICY_IS_MANDATORY);
         if (isMandatory != null && isMandatory instanceof String && Boolean.valueOf((String) isMandatory)) {
             return messageInfo.toString();
         }

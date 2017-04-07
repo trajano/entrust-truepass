@@ -13,4 +13,28 @@
   <scm>
     <url>https://github.com/trajano/${repo.id}</url>
   </scm>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>entrust-truepass-sample-web</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <version>2.10.1</version>
+        <configuration>
+          <security>
+            <security-role>
+              <role-name>users</role-name>
+            </security-role>
+          </security>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

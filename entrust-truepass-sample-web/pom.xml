@@ -13,4 +13,11 @@
   <scm>
     <url>https://github.com/trajano/${repo.id}</url>
   </scm>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>entrust-truepass-jaspic</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

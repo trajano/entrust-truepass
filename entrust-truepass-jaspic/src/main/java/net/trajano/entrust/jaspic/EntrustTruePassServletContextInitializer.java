@@ -11,7 +11,7 @@ public class EntrustTruePassServletContextInitializer implements
     ServletContextListener {
 
     /**
-     * Registers the authentication modules. {@inheritDoc} 
+     * Registers the authentication modules. {@inheritDoc}
      */
     @Override
     public void contextInitialized(final ServletContextEvent sce) {
@@ -22,9 +22,10 @@ public class EntrustTruePassServletContextInitializer implements
     }
 
     /**
-     * Does nothing. {@inheritDoc} 
+     * Does nothing. {@inheritDoc}
      */
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-	}
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+
+    }
 }
