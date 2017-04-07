@@ -9,7 +9,7 @@
   <artifactId>entrust-truepass-sample-ear</artifactId>
   <packaging>ear</packaging>
   <name>Entrust TruePass Sample EAR</name>
-  <description>This provides an application and modules that implement intrgration of Entrust TruePass on a Java application server.</description>
+  <description>This provides an application and modules that implement integration of Entrust TruePass on a Java application server.</description>
   <scm>
     <url>https://github.com/trajano/${repo.id}</url>
   </scm>

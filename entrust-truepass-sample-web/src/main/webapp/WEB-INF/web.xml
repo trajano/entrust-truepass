@@ -22,4 +22,11 @@
 			<transport-guarantee>CONFIDENTIAL</transport-guarantee>
 		</user-data-constraint>
 	</security-constraint>
+	<login-config>
+		<auth-method>FORM</auth-method>
+		<form-login-config>
+			<form-login-page>/loginform.html</form-login-page>
+			<form-error-page>/loginerror.html</form-error-page>
+		</form-login-config>
+	</login-config>
 </web-app>
