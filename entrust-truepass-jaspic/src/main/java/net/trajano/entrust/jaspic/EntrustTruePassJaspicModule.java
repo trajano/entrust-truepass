@@ -1,7 +1,9 @@
 package net.trajano.entrust.jaspic;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -19,8 +21,7 @@ import javax.security.auth.message.config.ServerAuthContext;
 import javax.security.auth.message.module.ServerAuthModule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import net.trajano.entrust.jaspic.internal.Base64;
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * This is a simplified implementation of <a href=
@@ -35,6 +36,16 @@ import net.trajano.entrust.jaspic.internal.Base64;
 public class EntrustTruePassJaspicModule implements
     ServerAuthModule,
     ServerAuthContext {
+
+    /**
+     * Constant used by WebSphere credentials.
+     */
+    private static final String WSCREDENTIAL_SECURITYNAME = "com.ibm.wsspi.security.cred.securityName";
+
+    /**
+     * Constant used by WebSphere credentials.
+     */
+    private static final String WSCREDENTIAL_UNIQUEID = "com.ibm.wsspi.security.cred.uniqueId";
 
     /**
      * Logger.
@@ -60,6 +71,61 @@ public class EntrustTruePassJaspicModule implements
      * Mandatory flag.
      */
     private boolean mandatory;
+
+    private EntrustTruePassPrincipalProvider principalProvider;
+
+    /**
+     * WebSphere user. If this is not null then the websphereWorkaounrd would be
+     */
+    private final String websphereUser;
+
+    public EntrustTruePassJaspicModule(EntrustTruePassPrincipalProvider principalProvider) {
+        this(principalProvider, null);
+    }
+
+    /**
+     * Implements the WebSphere workaround. This requires the
+     * {@code webspehereUser} to exist in the user registry of WebSphere.
+     *
+     * @param client
+     *            client subject
+     * @param websphereUser
+     *            existing WebSphere user name.
+     * @param principalName
+     *            name that is going to be part of the principal.
+     * @throws AuthException
+     */
+    private void websphereWorkaround(final Subject client,
+        String websphereUser,
+        String principalName) throws AuthException {
+
+        try {
+            final Object userRegistry = Class.forName("com.ibm.wsspi.security.registry.RegistryHelper").getMethod("getUserRegistry", String.class).invoke(null, new Object[] {
+                null
+            });
+            final String uniqueid = (String) userRegistry.getClass().getMethod("getUniqueUserId", String.class).invoke(userRegistry, websphereUser);
+
+            final Hashtable<String, Object> hashtable = new Hashtable<String, Object>();
+            hashtable.put(WSCREDENTIAL_UNIQUEID, uniqueid);
+            hashtable.put(WSCREDENTIAL_SECURITYNAME, principalName);
+
+            client.getPrivateCredentials().add(hashtable);
+        } catch (IllegalAccessException e) {
+            throw new AuthException(e.getMessage());
+        } catch (InvocationTargetException e) {
+            throw new AuthException(e.getMessage());
+        } catch (NoSuchMethodException e) {
+            throw new AuthException(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            throw new AuthException(e.getMessage());
+        }
+    }
+
+    public EntrustTruePassJaspicModule(EntrustTruePassPrincipalProvider principalProvider,
+        String websphereUser) {
+        this.principalProvider = principalProvider;
+        this.websphereUser = websphereUser;
+    }
 
     /**
      * Does nothing.
@@ -96,21 +162,6 @@ public class EntrustTruePassJaspicModule implements
         return new Class<?>[] {
             HttpServletRequest.class,
             HttpServletResponse.class
-        };
-    }
-
-    /**
-     * Builds a list of groups from the request. This simply returns "users".
-     * This value must match the security-roles in web.xml
-     *
-     * @param req
-     *            servlet request.
-     * @return array of groups.
-     */
-    private String[] groups(final HttpServletRequest req) {
-
-        return new String[] {
-            "users"
         };
     }
 
@@ -173,16 +224,18 @@ public class EntrustTruePassJaspicModule implements
                 resp.sendError(HttpURLConnection.HTTP_FORBIDDEN, "An HTTPS connection is required");
                 return AuthStatus.SEND_FAILURE;
             }
-            final String userName = Base64.decodeToString(req.getHeader(ENTRUST_HTTP_HEADER));
-            if (userName == null && mandatory) {
+            String header = req.getHeader(ENTRUST_HTTP_HEADER);
+            if (header == null && mandatory) {
                 return AuthStatus.FAILURE;
-            } else if (userName == null && !mandatory) {
+            } else if (header == null && !mandatory) {
                 return AuthStatus.SUCCESS;
             }
-
+            final String entrustToken = new String(DatatypeConverter.parseBase64Binary(header));
+            final String principalName = principalProvider.getPrincipalNameFromEntrustToken(entrustToken);
+            websphereWorkaround(client, websphereUser, principalName);
             handler.handle(new Callback[] {
-                new CallerPrincipalCallback(client, userName),
-                new GroupPrincipalCallback(client, groups(req))
+                new CallerPrincipalCallback(client, principalName),
+                new GroupPrincipalCallback(client, principalProvider.getGroupsFromEntrustToken(entrustToken))
             });
             return AuthStatus.SUCCESS;
         } catch (final IOException e) {

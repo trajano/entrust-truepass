@@ -1,10 +1,7 @@
 package net.trajano.entrust.jaspic;
 
-import java.util.Map;
-
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.message.AuthException;
-import javax.security.auth.message.config.AuthConfigFactory;
 import javax.security.auth.message.config.AuthConfigProvider;
 import javax.security.auth.message.config.ClientAuthConfig;
 import javax.security.auth.message.config.ServerAuthConfig;
@@ -33,39 +30,28 @@ import net.trajano.entrust.jaspic.internal.ServerAuthModuleAuthConfig;
  * }
  * </pre>
  */
-public class EntrustTruePassAuthModuleConfigProvider implements
+public class EntrustTruePassAuthConfigProvider implements
     AuthConfigProvider {
 
-    /**
-     * {@link AuthConfigFactory} passed in through the constructor. This is not
-     * being used anywhere at the moment.
-     */
-    @SuppressWarnings("unused")
-    private final AuthConfigFactory authConfigFactory;
+    private EntrustTruePassPrincipalProvider principalProvider;
 
-    /**
-     * Options.
-     */
-    private final Map<String, String> options;
+    private String websphereUser;
 
-    /**
-     * This is called by
-     * {@link AuthConfigFactory#registerConfigProvider(String, Map, String, String, String)}
-     * when registering the provider.
-     *
-     * @param options
-     *            options to pass to the modules and the name of the module
-     *            classes
-     * @param authConfigFactory
-     *            configuration factory
-     */
-    public EntrustTruePassAuthModuleConfigProvider(final Map<String, String> options,
-        final AuthConfigFactory authConfigFactory) {
-
-        this.authConfigFactory = authConfigFactory;
-        this.options = options;
+    public EntrustTruePassAuthConfigProvider(EntrustTruePassPrincipalProvider principalProvider) {
+        this(principalProvider, null);
     }
 
+    public EntrustTruePassAuthConfigProvider(EntrustTruePassPrincipalProvider principalProvider,
+        String websphereUser) {
+        this.principalProvider = principalProvider;
+        this.websphereUser = websphereUser;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @return {@code null}
+     */
     @Override
     public ClientAuthConfig getClientAuthConfig(final String layer,
         final String appContext,
@@ -79,7 +65,7 @@ public class EntrustTruePassAuthModuleConfigProvider implements
         final String appContext,
         final CallbackHandler handler) throws AuthException {
 
-        return new ServerAuthModuleAuthConfig(options, layer, appContext, handler);
+        return new ServerAuthModuleAuthConfig(layer, appContext, handler, principalProvider, websphereUser);
     }
 
     /**

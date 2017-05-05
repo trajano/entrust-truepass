@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
-  http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 	<distributable />
-	<listener>
-		<listener-class>net.trajano.entrust.jaspic.EntrustTruePassServletContextInitializer</listener-class>
-	</listener>
-	<security-role>
-		<role-name>users</role-name>
-	</security-role>
+	<context-param>
+		<description>JEE6 does not provide ServletContext.getVirtualServerName() this is the worka around.</description>
+		<param-name>EntrustTruePass.VIRTUAL_SERVER_NAME</param-name>
+		<param-value>default_host</param-value>
+	</context-param>
+	<context-param>
+		<description>An user that exists in the WebSphere User Registry.  Using this will enable the WebSphere workaround.</description>
+		<param-name>EntrustTruePass.WEBSPHERE_USER</param-name>
+		<param-value>websphere</param-value>
+	</context-param>
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>all</web-resource-name>
@@ -22,11 +25,7 @@
 			<transport-guarantee>CONFIDENTIAL</transport-guarantee>
 		</user-data-constraint>
 	</security-constraint>
-	<login-config>
-		<auth-method>FORM</auth-method>
-		<form-login-config>
-			<form-login-page>/loginform.html</form-login-page>
-			<form-error-page>/loginerror.html</form-error-page>
-		</form-login-config>
-	</login-config>
+	<security-role>
+		<role-name>users</role-name>
+	</security-role>
 </web-app>

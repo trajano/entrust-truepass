@@ -19,5 +19,11 @@
       <artifactId>entrust-truepass-jaspic</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>jstl</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.2</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 </project>

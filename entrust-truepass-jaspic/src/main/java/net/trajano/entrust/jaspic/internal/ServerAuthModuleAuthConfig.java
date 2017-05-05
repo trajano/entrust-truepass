@@ -1,7 +1,6 @@
 package net.trajano.entrust.jaspic.internal;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
@@ -14,6 +13,7 @@ import javax.security.auth.message.config.ServerAuthContext;
 import javax.security.auth.message.module.ServerAuthModule;
 
 import net.trajano.entrust.jaspic.EntrustTruePassJaspicModule;
+import net.trajano.entrust.jaspic.EntrustTruePassPrincipalProvider;
 
 /**
  * Provides initialized server modules/contexts.
@@ -48,48 +48,32 @@ public class ServerAuthModuleAuthConfig implements
      */
     private final String layer;
 
-    /**
-     * Setup options.
-     */
-    private final Map<String, String> options;
+    private EntrustTruePassPrincipalProvider principalProvider;
+
+    private String websphereUser;
 
     /**
-     * @param options
-     *            options
      * @param layer
      *            layer
      * @param appContext
      *            application context
      * @param handler
      *            handler
+     * @param principalProvider
+     * @param websphereUser
+     *            WebSphere user
      */
-    public ServerAuthModuleAuthConfig(final Map<String, String> options,
+    public ServerAuthModuleAuthConfig(
         final String layer,
         final String appContext,
-        final CallbackHandler handler) {
+        final CallbackHandler handler,
+        EntrustTruePassPrincipalProvider principalProvider,
+        String websphereUser) {
         this.appContext = appContext;
         this.layer = layer;
-        this.options = options;
         this.handler = handler;
-    }
-
-    /**
-     * Augments the properties with additional properties.
-     *
-     * @param properties
-     *            properties to augment with.
-     * @return augmented properties
-     */
-    @SuppressWarnings("unchecked")
-    protected Map<?, ?> augmentProperties(@SuppressWarnings("rawtypes") final Map properties) {
-
-        if (properties == null) {
-            return options;
-        }
-        final Map<String, String> augmentedOptions = new ConcurrentHashMap<String, String>(options);
-        augmentedOptions.putAll(properties);
-        return augmentedOptions;
-
+        this.principalProvider = principalProvider;
+        this.websphereUser = websphereUser;
     }
 
     public String getAppContext() {
@@ -144,14 +128,13 @@ public class ServerAuthModuleAuthConfig implements
         final Subject serviceSubject,
         @SuppressWarnings("rawtypes") final Map properties) throws AuthException {
 
-        final Map<?, ?> augmentedOptions = augmentProperties(properties);
-        final ServerAuthContext context = new EntrustTruePassJaspicModule();
+        final ServerAuthContext context = new EntrustTruePassJaspicModule(principalProvider, websphereUser);
 
         final ServerAuthModule module = (ServerAuthModule) context;
         if (authContextID == null) {
-            module.initialize(NON_MANDATORY, NON_MANDATORY, getHandler(), augmentedOptions);
+            module.initialize(NON_MANDATORY, NON_MANDATORY, getHandler(), properties);
         } else {
-            module.initialize(MANDATORY, MANDATORY, getHandler(), augmentedOptions);
+            module.initialize(MANDATORY, MANDATORY, getHandler(), properties);
         }
         return context;
     }
