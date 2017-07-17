@@ -39,6 +39,7 @@ public class EntrustTruePassAuthConfigProvider implements
 
     public EntrustTruePassAuthConfigProvider(EntrustTruePassPrincipalProvider principalProvider) {
         this(principalProvider, null);
+        System.out.println(this);
     }
 
     public EntrustTruePassAuthConfigProvider(EntrustTruePassPrincipalProvider principalProvider,
@@ -57,6 +58,7 @@ public class EntrustTruePassAuthConfigProvider implements
         final String appContext,
         final CallbackHandler handler) throws AuthException {
 
+        System.out.println("getClientAuthConfig");
         return null;
     }
 
@@ -65,6 +67,7 @@ public class EntrustTruePassAuthConfigProvider implements
         final String appContext,
         final CallbackHandler handler) throws AuthException {
 
+        System.out.println("getServerAuthConfig");
         return new ServerAuthModuleAuthConfig(layer, appContext, handler, principalProvider, websphereUser);
     }
 
@@ -74,6 +77,7 @@ public class EntrustTruePassAuthConfigProvider implements
     @Override
     public void refresh() {
 
+        System.out.println("refresh()");
         // does nothing
     }
 

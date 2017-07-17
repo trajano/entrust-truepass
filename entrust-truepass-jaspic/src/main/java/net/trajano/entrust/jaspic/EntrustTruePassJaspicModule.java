@@ -99,6 +99,7 @@ public class EntrustTruePassJaspicModule implements
         String websphereUser,
         String principalName) throws AuthException {
 
+    	System.out.println("HERE! " + websphereUser + " " + principalName);
         try {
             final Object userRegistry = Class.forName("com.ibm.wsspi.security.registry.RegistryHelper").getMethod("getUserRegistry", String.class).invoke(null, new Object[] {
                 null
@@ -224,6 +225,33 @@ public class EntrustTruePassJaspicModule implements
                 resp.sendError(HttpURLConnection.HTTP_FORBIDDEN, "An HTTPS connection is required");
                 return AuthStatus.SEND_FAILURE;
             }
+            final String principalName = "mememe";
+            websphereWorkaround(client, websphereUser, principalName);
+            return AuthStatus.SUCCESS;
+        } catch (final IOException e) {
+            LOG.throwing(this.getClass().getName(), "IOException was thrown on validateRequest()", e);
+            throw new AuthException(e.getMessage());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public AuthStatus validateRequest2(final MessageInfo messageInfo,
+        final Subject client,
+        final Subject serviceSubject)
+        throws AuthException {
+
+        final HttpServletRequest req = (HttpServletRequest) messageInfo.getRequestMessage();
+        final HttpServletResponse resp = (HttpServletResponse) messageInfo.getResponseMessage();
+        try {
+            if (!mandatory && !req.isSecure()) {
+                return AuthStatus.SUCCESS;
+            }
+            if (!req.isSecure()) {
+                resp.sendError(HttpURLConnection.HTTP_FORBIDDEN, "An HTTPS connection is required");
+                return AuthStatus.SEND_FAILURE;
+            }
             String header = req.getHeader(ENTRUST_HTTP_HEADER);
             if (header == null && mandatory) {
                 return AuthStatus.FAILURE;
@@ -233,16 +261,9 @@ public class EntrustTruePassJaspicModule implements
             final String entrustToken = new String(DatatypeConverter.parseBase64Binary(header));
             final String principalName = principalProvider.getPrincipalNameFromEntrustToken(entrustToken);
             websphereWorkaround(client, websphereUser, principalName);
-            handler.handle(new Callback[] {
-                new CallerPrincipalCallback(client, principalName),
-                new GroupPrincipalCallback(client, principalProvider.getGroupsFromEntrustToken(entrustToken))
-            });
             return AuthStatus.SUCCESS;
         } catch (final IOException e) {
             LOG.throwing(this.getClass().getName(), "IOException was thrown on validateRequest()", e);
-            throw new AuthException(e.getMessage());
-        } catch (final UnsupportedCallbackException e) {
-            LOG.throwing(this.getClass().getName(), "UnsupportedCallbackException was thrown on validateRequest()", e);
             throw new AuthException(e.getMessage());
         }
     }

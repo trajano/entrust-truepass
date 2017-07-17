@@ -63,8 +63,7 @@ public class ServerAuthModuleAuthConfig implements
      * @param websphereUser
      *            WebSphere user
      */
-    public ServerAuthModuleAuthConfig(
-        final String layer,
+    public ServerAuthModuleAuthConfig(final String layer,
         final String appContext,
         final CallbackHandler handler,
         EntrustTruePassPrincipalProvider principalProvider,
@@ -78,6 +77,7 @@ public class ServerAuthModuleAuthConfig implements
 
     public String getAppContext() {
 
+        System.out.println("appContext = " + appContext);
         return appContext;
     }
 
@@ -94,6 +94,7 @@ public class ServerAuthModuleAuthConfig implements
      */
     public String getAuthContextID(final MessageInfo messageInfo) {
 
+        System.out.println("getAuthContextID" + messageInfo);
         final Object isMandatory = messageInfo.getMap().get(JAVAX_SECURITY_AUTH_MESSAGE_MESSAGE_POLICY_IS_MANDATORY);
         if (isMandatory != null && isMandatory instanceof String && Boolean.valueOf((String) isMandatory)) {
             return messageInfo.toString();
@@ -102,6 +103,8 @@ public class ServerAuthModuleAuthConfig implements
     }
 
     protected CallbackHandler getHandler() {
+
+        System.out.println("getHandler=" + handler);
 
         return handler;
     }
@@ -121,6 +124,8 @@ public class ServerAuthModuleAuthConfig implements
      */
     public void refresh() {
 
+        System.out.println("ServerAuth.refresh()");
+
     }
 
     @Override
@@ -128,6 +133,7 @@ public class ServerAuthModuleAuthConfig implements
         final Subject serviceSubject,
         @SuppressWarnings("rawtypes") final Map properties) throws AuthException {
 
+        System.out.println("getAuthContext " + authContextID + serviceSubject + properties);
         final ServerAuthContext context = new EntrustTruePassJaspicModule(principalProvider, websphereUser);
 
         final ServerAuthModule module = (ServerAuthModule) context;

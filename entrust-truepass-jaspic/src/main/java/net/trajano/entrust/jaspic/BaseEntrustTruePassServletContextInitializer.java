@@ -39,10 +39,13 @@ public abstract class BaseEntrustTruePassServletContextInitializer implements
     public void contextInitialized(final ServletContextEvent sce) {
 
         final ServletContext context = sce.getServletContext();
-        String virtualServerName = (String) context.getAttribute("EntrustTruePass.VIRTUAL_SERVER_NAME");
-        String websphereUser = (String) context.getAttribute("EntrustTruePass.WEBSPHERE_USER");
+        //      String virtualServerName = (String) context.getAttribute("EntrustTruePass.VIRTUAL_SERVER_NAME");
+        //      String websphereUser = (String) context.getAttribute("EntrustTruePass.WEBSPHERE_USER");
+        String virtualServerName = "default_host";
+        String websphereUser = "websphere";
         registrationID = AuthConfigFactory.getFactory().registerConfigProvider(
             new EntrustTruePassAuthConfigProvider(principalProvider, websphereUser), "HttpServlet",
             virtualServerName + " " + context.getContextPath(), "JEE Sample");
+        System.out.println("registrationID = " + registrationID);
     }
 }

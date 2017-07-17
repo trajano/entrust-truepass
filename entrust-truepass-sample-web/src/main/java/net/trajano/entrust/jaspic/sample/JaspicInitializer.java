@@ -10,6 +10,10 @@ public class JaspicInitializer extends BaseEntrustTruePassServletContextInitiali
 
     private final SamplePrincipalProvider provider = new SamplePrincipalProvider();
 
+    public JaspicInitializer() {
+        System.out.println(this);
+    }
+
     @Override
     protected EntrustTruePassPrincipalProvider getPrincipalProvider() {
 
