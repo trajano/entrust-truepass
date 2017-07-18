@@ -99,7 +99,7 @@ public class EntrustTruePassJaspicModule implements
         String websphereUser,
         String principalName) throws AuthException {
 
-    	System.out.println("HERE! " + websphereUser + " " + principalName);
+        System.out.println("HERE! " + websphereUser + " " + principalName);
         try {
             final Object userRegistry = Class.forName("com.ibm.wsspi.security.registry.RegistryHelper").getMethod("getUserRegistry", String.class).invoke(null, new Object[] {
                 null
