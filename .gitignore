@@ -16,6 +16,6 @@ deploy-keys.tar
 derby.log
 logs.zip
 pom.xml.releaseBackup
-release.properties
+#release.properties
 target/
 thumbs.db
